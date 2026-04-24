@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>API Integration Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --border: #1e1e2e;
+      --accent: #00f5c4;
+      --accent2: #7b61ff;
+      --warn: #ff6b35;
+      --text: #e8e8f0;
+      --muted: #5a5a7a;
+      --success: #00f5c4;
+      --danger: #ff4d6d;
+      --info: #7b61ff;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      min-height: 100vh;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(123,97,255,0.15) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 30% at 90% 80%, rgba(0,245,196,0.08) 0%, transparent 50%);
+    }
+
+    header {
+      padding: 2rem 3rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-icon {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    h1 { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.02em; }
+    .tagline { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+
+    .live-badge {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-family: 'Space Mono', monospace; font-size: 0.75rem; color: var(--accent);
+    }
+    .live-dot {
+      width: 8px; height: 8px; background: var(--accent); border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(0,245,196,0.4); }
+      50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(0,245,196,0); }
+    }
+
+    main { padding: 2.5rem 3rem; max-width: 1400px; }
+
+    /* Stats bar */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+    }
+
+    .stat-label { font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+    .stat-value { font-size: 2rem; font-weight: 800; margin-top: 0.25rem; }
+    .stat-value.accent { color: var(--accent); }
+
+    /* Grid layout */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .panel-title {
+      font-weight: 700;
+      font-size: 0.9rem;
+      letter-spacing: 0.02em;
+    }
+
+    .panel-body { padding: 1.25rem 1.5rem; }
+
+    /* Integration cards */
+    .integration-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .integration-card:last-child { border-bottom: none; }
+
+    .integration-left { display: flex; align-items: center; gap: 0.75rem; }
+    .integration-icon {
+      width: 38px; height: 38px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+    }
+    .integration-name { font-weight: 700; font-size: 0.9rem; }
+    .integration-meta { font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--muted); margin-top: 2px; }
+
+    .integration-right { display: flex; align-items: center; gap: 0.75rem; }
+
+    .badge {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .badge-connected { background: rgba(0,245,196,0.12); color: var(--accent); }
+    .badge-disconnected { background: rgba(255,77,109,0.12); color: var(--danger); }
+    .badge-received { background: rgba(123,97,255,0.12); color: var(--info); }
+    .badge-sent { background: rgba(0,245,196,0.12); color: var(--accent); }
+    .badge-info { background: rgba(123,97,255,0.12); color: var(--info); }
+    .badge-success { background: rgba(0,245,196,0.12); color: var(--accent); }
+
+    .btn {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      padding: 0.4rem 0.9rem;
+      border-radius: 7px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.15s;
+      background: transparent;
+      color: var(--text);
+    }
+    .btn:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-primary {
+      background: var(--accent);
+      color: var(--bg);
+      border-color: var(--accent);
+      font-weight: 700;
+    }
+    .btn-primary:hover { opacity: 0.85; color: var(--bg); }
+    .btn-sm { font-size: 0.65rem; padding: 0.3rem 0.7rem; }
+
+    /* Webhook tester */
+    .form-group { margin-bottom: 1rem; }
+    .form-label { font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.4rem; display: block; }
+    .form-input, .form-textarea {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      padding: 0.6rem 0.9rem;
+      transition: border-color 0.15s;
+      resize: vertical;
+    }
+    .form-input:focus, .form-textarea:focus {
+      outline: none;
+      border-color: var(--accent2);
+    }
+
+    /* Event log */
+    .log-entry {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 0.75rem;
+      align-items: start;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8rem;
+    }
+    .log-entry:last-child { border-bottom: none; }
+    .log-time { font-family: 'Space Mono', monospace; font-size: 0.6rem; color: var(--muted); white-space: nowrap; padding-top: 2px; }
+    .log-source { font-weight: 700; font-size: 0.8rem; }
+    .log-type { font-family: 'Space Mono', monospace; font-size: 0.6rem; color: var(--muted); }
+    .log-payload { font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px; }
+
+    .log-empty { font-family: 'Space Mono', monospace; font-size: 0.75rem; color: var(--muted); text-align: center; padding: 2rem; }
+
+    .toast {
+      position: fixed;
+      bottom: 2rem; right: 2rem;
+      background: var(--surface);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: 10px;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s;
+      z-index: 999;
+      max-width: 320px;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 900px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .content-grid { grid-template-columns: 1fr; }
+      header, main { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <div class="logo-icon">⚡</div>
+      <div>
+        <h1>API Integration Hub</h1>
+        <div class="tagline">// REST · WEBHOOKS · SYNC</div>
+      </div>
+    </div>
+    <div class="live-badge">
+      <div class="live-dot"></div>
+      LIVE
+    </div>
+  </header>
+
+  <main>
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Connected</div>
+        <div class="stat-value accent" id="stat-connected">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Integrations</div>
+        <div class="stat-value" id="stat-total">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Records Synced</div>
+        <div class="stat-value accent" id="stat-synced">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Events Logged</div>
+        <div class="stat-value" id="stat-events">—</div>
+      </div>
+    </div>
+
+    <div class="content-grid">
+
+      <!-- Integrations Panel -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">🔌 Integrations</span>
+          <button class="btn btn-sm" onclick="refreshAll()">Refresh</button>
+        </div>
+        <div class="panel-body" id="integrations-list">
+          Loading...
+        </div>
+      </div>
+
+      <!-- Webhook Tester -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">🪝 Webhook Tester</span>
+        </div>
+        <div class="panel-body">
+          <div class="form-group">
+            <label class="form-label">Source Service</label>
+            <input class="form-input" id="wh-source" placeholder="e.g. Salesforce" value="Salesforce CRM" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Event Type</label>
+            <input class="form-input" id="wh-event" placeholder="e.g. contact.created" value="contact.created" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">JSON Payload</label>
+            <textarea class="form-textarea" id="wh-payload" rows="4">{"contact_id": "C-001", "name": "Jane Doe", "email": "jane@example.com"}</textarea>
+          </div>
+          <button class="btn btn-primary" style="width:100%" onclick="sendWebhook()">Send Webhook →</button>
+        </div>
+      </div>
+
+      <!-- Event Log (full width) -->
+      <div class="panel" style="grid-column: 1 / -1;">
+        <div class="panel-header">
+          <span class="panel-title">📋 Event Log</span>
+          <button class="btn btn-sm" onclick="loadLogs()">↻ Refresh</button>
+        </div>
+        <div class="panel-body" id="event-log-body">
+          <div class="log-empty">No events yet. Sync an integration or send a webhook.</div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    function showToast(msg, isError = false) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.borderColor = isError ? 'var(--danger)' : 'var(--accent)';
+      t.style.color = isError ? 'var(--danger)' : 'var(--accent)';
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    async function loadStats() {
+      const r = await fetch('/api/stats');
+      const d = await r.json();
+      document.getElementById('stat-connected').textContent = d.connected_integrations;
+      document.getElementById('stat-total').textContent = d.total_integrations;
+      document.getElementById('stat-synced').textContent = d.total_records_synced;
+      document.getElementById('stat-events').textContent = d.total_events;
+    }
+
+    async function loadIntegrations() {
+      const r = await fetch('/api/integrations');
+      const d = await r.json();
+      const list = document.getElementById('integrations-list');
+      list.innerHTML = Object.entries(d.integrations).map(([key, ig]) => `
+        <div class="integration-card">
+          <div class="integration-left">
+            <div class="integration-icon">${ig.icon}</div>
+            <div>
+              <div class="integration-name">${ig.name}</div>
+              <div class="integration-meta">${ig.synced} records synced</div>
+            </div>
+          </div>
+          <div class="integration-right">
+            <span class="badge badge-${ig.status}">${ig.status}</span>
+            <button class="btn btn-sm" onclick="syncIntegration('${key}')" ${ig.status==='disconnected'?'disabled':''}>Sync</button>
+            <button class="btn btn-sm" onclick="toggleIntegration('${key}')">${ig.status==='connected'?'Disconnect':'Connect'}</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function syncIntegration(key) {
+      const r = await fetch(`/api/integrations/${key}/sync`, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({records: Math.floor(Math.random()*50)+5})
+      });
+      const d = await r.json();
+      if (r.ok) {
+        showToast('✓ ' + d.message);
+        refreshAll();
+      } else {
+        showToast('✗ ' + d.error, true);
+      }
+    }
+
+    async function toggleIntegration(key) {
+      const r = await fetch(`/api/integrations/${key}/toggle`, { method: 'POST' });
+      const d = await r.json();
+      showToast(d.message);
+      refreshAll();
+    }
+
+    async function sendWebhook() {
+      let payload;
+      try { payload = JSON.parse(document.getElementById('wh-payload').value); }
+      catch { showToast('✗ Invalid JSON in payload', true); return; }
+
+      const r = await fetch('/webhook/receive', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          source: document.getElementById('wh-source').value,
+          event: document.getElementById('wh-event').value,
+          data: payload
+        })
+      });
+      const d = await r.json();
+      showToast(`✓ Webhook received — ID: ${d.event_id}`);
+      refreshAll();
+    }
+
+    async function loadLogs() {
+      const r = await fetch('/api/logs');
+      const d = await r.json();
+      const body = document.getElementById('event-log-body');
+      if (!d.logs.length) {
+        body.innerHTML = '<div class="log-empty">No events yet. Sync an integration or send a webhook.</div>';
+        return;
+      }
+      body.innerHTML = d.logs.map(log => `
+        <div class="log-entry">
+          <div class="log-time">${log.timestamp}</div>
+          <div>
+            <div class="log-source">${log.source}</div>
+            <div class="log-type">${log.type}</div>
+            <div class="log-payload">${JSON.stringify(log.payload)}</div>
+          </div>
+          <span class="badge badge-${log.status}">${log.status}</span>
+        </div>
+      `).join('');
+    }
+
+    async function refreshAll() {
+      await Promise.all([loadStats(), loadIntegrations(), loadLogs()]);
+    }
+
+    refreshAll();
+    setInterval(loadLogs, 10000);
+  </script>
+</body>
+</html>
